@@ -21,6 +21,7 @@
     --admin-naranja-claro: #fff3e0;
     --admin-rojo: #dc2626;
     --admin-radio: 10px;
+    --admin-fondo-pagina: #2b4a8a;
 }
 
 * { box-sizing: border-box; }
@@ -28,7 +29,7 @@
 body.admin-body {
     margin: 0;
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: var(--admin-fondo);
+    background: var(--admin-fondo-pagina);
     color: #1f2937;
 }
 
@@ -343,7 +344,7 @@ body.admin-body {
 }
 
 .btn-primario {
-    background: var(--admin-azul);
+    background: linear-gradient(135deg, var(--admin-azul), #4f8ef7);
     color: #fff;
     border: none;
     padding: 9px 16px;
@@ -354,6 +355,7 @@ body.admin-body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
 }
 
 /* ---------- Tabla de usuarios ---------- */
@@ -575,19 +577,35 @@ body.admin-body {
 }
 
 .form-card {
-    background: #fff;
+    background: linear-gradient(165deg, #ffffff 0%, #f4f7ff 100%);
     border: 1px solid var(--admin-borde);
-    border-radius: var(--admin-radio);
-    padding: 28px 30px;
+    border-radius: 18px;
+    padding: 30px 32px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(43, 74, 138, 0.10);
+}
+
+.form-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--admin-azul), #7aa2f7);
 }
 
 .form-card-header {
-    margin-bottom: 22px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--admin-borde);
 }
 
 .form-card-header h2 {
     margin: 0 0 4px;
     font-size: 1.2rem;
+    color: #1e3a5f;
 }
 
 .form-card-header p {
@@ -611,7 +629,7 @@ body.admin-body {
     display: block;
     font-size: 0.82rem;
     font-weight: 600;
-    color: #374151;
+    color: #33507d;
     margin-bottom: 6px;
 }
 
@@ -623,13 +641,15 @@ body.admin-body {
     border-radius: 8px;
     font-size: 0.9rem;
     font-family: inherit;
-    background: #fff;
+    background: #fbfcff;
     color: #1f2937;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 
 .form-grupo input:focus,
 .form-grupo select:focus {
     outline: none;
+    background: #fff;
     border-color: var(--admin-azul);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
@@ -674,4 +694,193 @@ body.admin-body {
     background: var(--admin-verde-claro);
     color: var(--admin-verde);
     border: 1px solid #bbf0d0;
+}
+
+/* ===========================================================
+   Modal "Nuevo Usuario" (estilo tarjeta flotante)
+   =========================================================== */
+.modal-fondo {
+    position: fixed;
+    inset: 0;
+    background: rgba(74, 111, 165, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 10;
+}
+
+.modal-tarjeta {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(15, 28, 46, 0.25);
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 22px 22px 16px;
+    border-bottom: 1px solid var(--admin-borde);
+}
+
+.modal-header-icono {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--admin-azul), #4f8ef7);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.modal-header-texto h2 {
+    margin: 0 0 2px;
+    font-size: 1.1rem;
+}
+
+.modal-header-texto p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--admin-texto-suave);
+}
+
+.modal-cerrar {
+    margin-left: auto;
+    color: var(--admin-texto-suave);
+    text-decoration: none;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 4px;
+}
+
+.modal-cuerpo {
+    padding: 18px 22px 22px;
+}
+
+.seccion-titulo {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--admin-azul);
+    margin: 18px 0 12px;
+}
+
+.seccion-titulo:first-child { margin-top: 0; }
+
+.seccion-nota {
+    font-size: 0.75rem;
+    color: var(--admin-texto-suave);
+    margin: -8px 0 12px;
+}
+
+.campo-password {
+    position: relative;
+}
+
+.campo-password button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--admin-texto-suave);
+    font-size: 0.95rem;
+    padding: 4px;
+}
+
+.bloque-estado-cuenta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--admin-fondo);
+    border: 1px solid var(--admin-borde);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 4px;
+}
+
+.bloque-estado-cuenta .icono-estado {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--admin-azul-claro);
+    color: var(--admin-azul);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bloque-estado-cuenta strong {
+    display: block;
+    font-size: 0.85rem;
+}
+
+.bloque-estado-cuenta span {
+    font-size: 0.75rem;
+    color: var(--admin-texto-suave);
+}
+
+.interruptor {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.interruptor input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.interruptor .deslizador {
+    position: absolute;
+    inset: 0;
+    background: #d1d5db;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.interruptor .deslizador::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+.interruptor input:checked + .deslizador {
+    background: var(--admin-azul);
+}
+
+.interruptor input:checked + .deslizador::before {
+    transform: translateX(18px);
+}
+
+.modal-cuerpo .form-acciones {
+    margin-top: 22px;
+    padding-top: 16px;
+}
+
+.btn-primario.btn-degradado {
+    background: linear-gradient(135deg, var(--admin-azul), #4f8ef7);
+    border: none;
 }

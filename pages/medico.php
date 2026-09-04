@@ -1,8 +1,7 @@
 <?php
 session_start();
 
-// --- Protección de sesión ya existente en tu proyecto (se respeta tal cual) ---
-if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'medico') {
+if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'admin') {
     header('Location: login.php');
     exit;
 }
