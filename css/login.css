@@ -1,4 +1,4 @@
-/* login.css — layout dividido, mobile-first */
+/* login.css — layout dividido, mobile-first, versión moderna */
 
 .pantalla-login {
     min-height: 100vh;
@@ -8,9 +8,26 @@
 
 /* Panel de marca: franja superior en móvil, columna izquierda en escritorio */
 .panel-marca {
-    background: var(--color-primario);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--color-primario) 0%, var(--color-primario-oscuro) 100%);
     color: #fff;
-    padding: 32px 24px;
+    padding: 40px 24px;
+}
+
+.patron-decorativo {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.14) 1.5px, transparent 1.5px);
+    background-size: 26px 26px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.contenido-marca {
+    position: relative;
+    z-index: 1;
+    animation: aparecer-desde-abajo 0.6s ease both;
 }
 
 .panel-marca .icono-cruz {
@@ -37,26 +54,121 @@
     align-items: center;
     justify-content: center;
     padding: 32px 20px 48px;
+    background: var(--color-fondo);
 }
 
 .tarjeta-login {
     width: 100%;
-    max-width: 360px;
+    max-width: 380px;
+    background: #fff;
+    border: 1px solid var(--color-borde);
+    border-radius: 16px;
+    padding: 32px 28px;
+    box-shadow: 0 20px 40px -20px rgba(11, 93, 82, 0.25);
+    animation: aparecer-desde-abajo 0.5s ease both 0.1s;
 }
 
 .tarjeta-login h2 {
-    font-size: 20px;
+    font-size: 21px;
 }
 
 .tarjeta-login .subtitulo {
     color: var(--color-texto-suave);
     font-size: 14px;
-    margin-bottom: 28px;
+    margin-bottom: 26px;
 }
 
 .tarjeta-login .btn {
     width: 100%;
-    margin-top: 6px;
+    margin-top: 8px;
+    transform: translateY(0);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tarjeta-login .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px -6px rgba(11, 93, 82, 0.45);
+}
+
+/* Fila con label + link de recuperar contraseña */
+.fila-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.fila-label label {
+    margin-bottom: 0;
+}
+
+.link-recuperar {
+    font-size: 13px;
+    color: var(--color-primario);
+    text-decoration: none;
+}
+
+.link-recuperar:hover {
+    text-decoration: underline;
+}
+
+/* Input con icono a la izquierda (y botón de ver contraseña a la derecha) */
+.input-con-icono {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-con-icono svg {
+    position: absolute;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    color: var(--color-texto-suave);
+    pointer-events: none;
+}
+
+.input-con-icono input {
+    padding-left: 42px;
+}
+
+.input-con-icono input#password {
+    padding-right: 42px;
+}
+
+.boton-ver-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    color: var(--color-texto-suave);
+    border-radius: 6px;
+}
+
+.boton-ver-password:hover {
+    color: var(--color-primario);
+    background: var(--color-primario-claro);
+}
+
+.boton-ver-password svg {
+    position: static;
+    width: 19px;
+    height: 19px;
+    pointer-events: auto;
+}
+
+@keyframes aparecer-desde-abajo {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Tablet y escritorio: pasa a dos columnas lado a lado */
@@ -89,6 +201,6 @@
     }
 
     .tarjeta-login {
-        max-width: 380px;
+        max-width: 400px;
     }
 }

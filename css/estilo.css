@@ -1,206 +1,114 @@
-/* login.css — layout dividido, mobile-first, versión moderna */
-
-.pantalla-login {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+:root {
+    --color-primario: #0B5D52;
+    --color-primario-oscuro: #08423B;
+    --color-primario-claro: #E4F2EF;
+    --color-acento: #C2760C;
+    --color-fondo: #FAFAF8;
+    --color-texto: #16241F;
+    --color-texto-suave: #5C6D68;
+    --color-borde: #DDE6E3;
+    --color-error: #B3261E;
+    --fuente: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --radio: 10px;
 }
 
-/* Panel de marca: franja superior en móvil, columna izquierda en escritorio */
-.panel-marca {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(160deg, var(--color-primario) 0%, var(--color-primario-oscuro) 100%);
-    color: #fff;
-    padding: 40px 24px;
+* {
+    box-sizing: border-box;
 }
 
-.patron-decorativo {
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgba(255,255,255,0.14) 1.5px, transparent 1.5px);
-    background-size: 26px 26px;
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-.contenido-marca {
-    position: relative;
-    z-index: 1;
-    animation: aparecer-desde-abajo 0.6s ease both;
-}
-
-.panel-marca .icono-cruz {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 16px;
-}
-
-.panel-marca h1 {
-    font-size: 22px;
-    color: #fff;
-}
-
-.panel-marca p {
-    font-size: 14px;
-    color: #CFE8E3;
-    max-width: 320px;
-}
-
-/* Panel del formulario */
-.panel-formulario {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 20px 48px;
+body {
+    margin: 0;
+    font-family: var(--fuente);
     background: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.5;
 }
 
-.tarjeta-login {
-    width: 100%;
-    max-width: 380px;
-    background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 16px;
-    padding: 32px 28px;
-    box-shadow: 0 20px 40px -20px rgba(11, 93, 82, 0.25);
-    animation: aparecer-desde-abajo 0.5s ease both 0.1s;
+h1, h2, h3 {
+    font-weight: 600;
+    margin: 0 0 8px;
 }
 
-.tarjeta-login h2 {
-    font-size: 21px;
+a {
+    color: var(--color-primario);
 }
 
-.tarjeta-login .subtitulo {
-    color: var(--color-texto-suave);
+.btn {
+    display: inline-block;
+    background: var(--color-primario);
+    color: #fff;
+    border: none;
+    border-radius: var(--radio);
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.15s ease;
+}
+
+.btn:hover {
+    background: var(--color-primario-oscuro);
+}
+
+.campo {
+    margin-bottom: 18px;
+}
+
+.campo label {
+    display: block;
     font-size: 14px;
-    margin-bottom: 26px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--color-texto);
 }
 
-.tarjeta-login .btn {
+.campo input,
+.campo select {
     width: 100%;
-    margin-top: 8px;
-    transform: translateY(0);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    padding: 12px 14px;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+    font-size: 15px;
+    font-family: var(--fuente);
+    background: #fff;
+    color: var(--color-texto);
 }
 
-.tarjeta-login .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 16px -6px rgba(11, 93, 82, 0.45);
+.campo input:focus,
+.campo select:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px var(--color-primario-claro);
 }
 
-/* Fila con label + link de recuperar contraseña */
-.fila-label {
+.mensaje-error {
+    background: #FBEAEA;
+    color: var(--color-error);
+    border: 1px solid #F0C7C4;
+    border-radius: var(--radio);
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.barra-superior {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
+    background: #fff;
+    border-bottom: 1px solid var(--color-borde);
+    padding: 16px 24px;
 }
 
-.fila-label label {
-    margin-bottom: 0;
-}
-
-.link-recuperar {
-    font-size: 13px;
+.barra-superior .marca {
+    font-weight: 700;
     color: var(--color-primario);
-    text-decoration: none;
 }
 
-.link-recuperar:hover {
-    text-decoration: underline;
-}
-
-/* Input con icono a la izquierda (y botón de ver contraseña a la derecha) */
-.input-con-icono {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.input-con-icono svg {
-    position: absolute;
-    left: 14px;
-    width: 18px;
-    height: 18px;
-    color: var(--color-texto-suave);
-    pointer-events: none;
-}
-
-.input-con-icono input {
-    padding-left: 42px;
-}
-
-.input-con-icono input#password {
-    padding-right: 42px;
-}
-
-.boton-ver-password {
-    position: absolute;
-    right: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    display: flex;
-    color: var(--color-texto-suave);
-    border-radius: 6px;
-}
-
-.boton-ver-password:hover {
-    color: var(--color-primario);
-    background: var(--color-primario-claro);
-}
-
-.boton-ver-password svg {
-    position: static;
-    width: 19px;
-    height: 19px;
-    pointer-events: auto;
-}
-
-@keyframes aparecer-desde-abajo {
-    from {
-        opacity: 0;
-        transform: translateY(14px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Tablet y escritorio: pasa a dos columnas lado a lado */
-@media (min-width: 768px) {
-    .pantalla-login {
-        flex-direction: row;
-    }
-
-    .panel-marca {
-        width: 38%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: 48px;
-    }
-
-    .panel-marca h1 {
-        font-size: 28px;
-    }
-
-    .panel-formulario {
-        width: 62%;
-    }
-}
-
-@media (min-width: 1024px) {
-    .panel-marca {
-        width: 42%;
-        padding: 64px;
-    }
-
-    .tarjeta-login {
-        max-width: 400px;
-    }
+.contenido-panel {
+    max-width: 720px;
+    margin: 40px auto;
+    padding: 0 20px;
 }
