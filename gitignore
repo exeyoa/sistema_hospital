@@ -1,0 +1,9 @@
+# Archivos generados por macOS
+.DS_Store
+
+# Archivos generados por Windows
+Thumbs.db
+
+# Carpeta de dependencias si algún día usan Composer/npm
+/vendor/
+/node_modules/
