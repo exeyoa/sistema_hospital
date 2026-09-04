@@ -1,7 +1,8 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'admin') {
+// --- Protección de sesión: solo médicos pueden entrar ---
+if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'medico') {
     header('Location: login.php');
     exit;
 }
