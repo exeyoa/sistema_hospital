@@ -1,10 +1,6 @@
 <?php
-session_start();
-
-if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'admin') {
-    header('Location: login.php');
-    exit;
-}
+require_once __DIR__ . '/../config/sesion.php';
+verificarSesion(['medico']);
 
 require_once __DIR__ . '/../config/conexion.php'; // expone $conexion (PDO)
 

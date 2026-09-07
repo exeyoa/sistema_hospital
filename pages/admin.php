@@ -1,14 +1,12 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/sesion.php';
 
 // ---------------------------------------------------------------
 // 1) PROTECCIÓN DE SESIÓN (RF-11)
-// Si no hay sesión activa o el rol no es 'admin', regresa al login.
+// Si no hay sesión activa, el timeout está expirado o el rol no es
+// 'admin', regresa al login.
 // ---------------------------------------------------------------
-if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'admin') {
-    header('Location: login.php');
-    exit;
-}
+verificarSesion(['admin']);
 
 require_once __DIR__ . '/../config/conexion.php'; // expone $conexion (PDO)
 

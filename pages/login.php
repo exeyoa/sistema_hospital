@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/sesion.php';
+iniciarSesionSegura();
 
 // Si ya inició sesión, lo mandamos directo a su panel
 if (isset($_SESSION['id_usuario'])) {
@@ -9,39 +10,74 @@ if (isset($_SESSION['id_usuario'])) {
 
 $error = $_SESSION['error_login'] ?? null;
 unset($_SESSION['error_login']);
+
+// Mensaje cuando el usuario llega aquí por cierre de sesión automático
+if (!$error && isset($_GET['expirada'])) {
+    $error = 'Tu sesión expiró por inactividad. Inicia sesión de nuevo.';
+}
+
+// Token CSRF para el formulario de login (RNF-08)
+$csrfToken = generarTokenCSRF();
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Iniciar sesión - Sistema Hospital</title>
+    <title>Iniciar sesión - Hospital Raúl Dávila Mena</title>
     <link rel="stylesheet" href="../css/estilo.css">
     <link rel="stylesheet" href="../css/login.css">
 </head>
 <body>
     <div class="pantalla-login">
         <div class="panel-marca">
+            <!-- Carrusel de fondo con crossfade (solo en login.php) -->
+            <div class="carrusel-fondo" aria-hidden="true">
+                <div class="carrusel-slide activo" style="background-image: url('../imagenes/foto_1.jpeg');"></div>
+                <div class="carrusel-slide" style="background-image: url('../imagenes/foto_2.jpeg');"></div>
+                <div class="carrusel-slide" style="background-image: url('../imagenes/foto_3.jpeg');"></div>
+            </div>
+
+            <!-- Degradado celeste/blanco superpuesto sobre las fotos -->
+            <div class="carrusel-velo" aria-hidden="true"></div>
+
+            <!-- Puntos decorativos -->
             <div class="patron-decorativo" aria-hidden="true"></div>
+
             <div class="contenido-marca">
-                <svg class="icono-cruz" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11 2H13V11H22V13H13V22H11V13H2V11H11V2Z" fill="#fff"/>
-                </svg>
-                <h1>Sistema Hospital</h1>
-                <p>Consultas, citas y recetas en un solo lugar para tu equipo médico.</p>
+                <div class="marca-encabezado">
+                    <div class="marca-titulo">
+                        <svg class="icono-cruz" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 2H13V11H22V13H13V22H11V13H2V11H11V2Z" fill="#fff"/>
+                        </svg>
+                        <h1>Hospital Raúl Dávila Mena</h1>
+                    </div>
+                    <img class="logo-cssp" src="../imagenes/logo_cssp.webp" alt="Logo de la Caja de Seguro Social">
+                </div>
+
+                <p class="mensaje-marca">Consultas, citas y recetas en un solo lugar para tu equipo médico.</p>
+
+                <div class="marca-seguridad">
+                    <svg class="icono-escudo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L20 5V11C20 16.05 16.63 20.48 12 22C7.37 20.48 4 16.05 4 11V5L12 2Z" stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M9 11.5L11 13.5L15.5 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Sistema seguro para la gestión de información hospitalaria.</span>
+                </div>
             </div>
         </div>
 
         <div class="panel-formulario">
             <div class="tarjeta-login">
                 <h2>Iniciar sesión</h2>
-                <p class="subtitulo">Ingresa con tu usuario asignado.</p>
 
                 <?php if ($error): ?>
                     <div class="mensaje-error"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
 
                 <form action="procesar_login.php" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+
                     <div class="campo">
                         <label for="usuario">Usuario</label>
                         <div class="input-con-icono">
@@ -80,6 +116,18 @@ unset($_SESSION['error_login']);
     </div>
 
     <script>
+        // --- Carrusel de fotos del panel de marca ---
+        const carruselFondo = document.querySelector('.carrusel-fondo');
+        if (carruselFondo) {
+            const slides = carruselFondo.querySelectorAll('.carrusel-slide');
+            let indice = 0;
+            setInterval(() => {
+                slides[indice].classList.remove('activo');
+                indice = (indice + 1) % slides.length;
+                slides[indice].classList.add('activo');
+            }, 15000);
+        }
+
         const botonVer = document.getElementById('botonVerPassword');
         const campoPassword = document.getElementById('password');
         const iconoOjo = document.getElementById('iconoOjo');

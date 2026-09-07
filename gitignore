@@ -7,3 +7,6 @@ Thumbs.db
 # Carpeta de dependencias si algún día usan Composer/npm
 /vendor/
 /node_modules/
+
+# Credenciales de configuración de correo (se rellenan manualmente)
+config/correo.php
