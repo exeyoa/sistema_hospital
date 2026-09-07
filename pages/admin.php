@@ -11,6 +11,7 @@ if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'admin') {
 }
 
 require_once __DIR__ . '/../config/conexion.php'; // expone $conexion (PDO)
+require_once __DIR__ . '/_iconos.php';
 
 // ---------------------------------------------------------------
 // 2) DATOS PARA LAS TARJETAS DE ESTADÍSTICAS (RF-09)
@@ -100,25 +101,25 @@ function iniciales($nombre, $apellido) {
     <!-- ================= SIDEBAR ================= -->
     <aside class="admin-sidebar">
         <div class="admin-logo">
-            <span class="icono-logo">🩺</span>
+            <span class="icono-logo"><?php echo icono('cruz-medica', 22); ?></span>
             Hospital San Rafael
         </div>
 
         <nav class="admin-nav">
-            <a href="admin.php" class="activo">🏠 Panel de Control <span class="punto-activo"></span></a>
+            <a href="admin.php" class="activo"><?php echo icono('home'); ?> Panel de Control <span class="punto-activo"></span></a>
 
             <div class="admin-nav-seccion">Gestión</div>
-            <a href="admin.php">👤 Usuarios</a>
-            <a href="admin_medicos.php">🧑‍⚕️ Médicos</a>
-            <a href="admin_pacientes.php">🧍 Pacientes</a>
-            <a href="admin_especialidades.php">🏷️ Especialidades</a>
-            <a href="admin_consultas.php">📅 Consultas</a>
-            <a href="admin_recetas.php">📄 Recetas</a>
+            <a href="admin.php"><?php echo icono('usuarios'); ?> Usuarios</a>
+            <a href="admin_medicos.php"><?php echo icono('medico'); ?> Médicos</a>
+            <a href="admin_pacientes.php"><?php echo icono('paciente'); ?> Pacientes</a>
+            <a href="admin_especialidades.php"><?php echo icono('estrella'); ?> Especialidades</a>
+            <a href="admin_consultas.php"><?php echo icono('calendario'); ?> Consultas</a>
+            <a href="admin_recetas.php"><?php echo icono('archivo'); ?> Recetas</a>
 
             <div class="admin-nav-seccion">Sistema</div>
-            <a href="admin_reportes.php">📊 Reportes</a>
-            <a href="admin_configuracion.php">⚙️ Configuración</a>
-            <a href="logout.php">🚪 Cerrar Sesión</a>
+            <a href="admin_reportes.php"><?php echo icono('grafico'); ?> Reportes</a>
+            <a href="admin_configuracion.php"><?php echo icono('engranaje'); ?> Configuración</a>
+            <a href="logout.php"><?php echo icono('salir'); ?> Cerrar Sesión</a>
         </nav>
 
         <div class="admin-sidebar-footer">
@@ -135,9 +136,12 @@ function iniciales($nombre, $apellido) {
 
         <!-- Barra superior -->
         <div class="admin-topbar">
-            <h1>☰ Panel de Administrador</h1>
+            <div class="admin-topbar-titulos">
+                <h1><?php echo icono('grafico', 22); ?> Panel de Administrador</h1>
+                <p class="admin-topbar-subtitulo">Resumen general del sistema</p>
+            </div>
             <div class="admin-topbar-derecha">
-                <div class="admin-campana">🔔<span class="badge-num">3</span></div>
+                <div class="admin-campana"><?php echo icono('campana', 20); ?><span class="badge-num"></span></div>
                 <div class="admin-usuario-topbar">
                     <div class="avatar-mini"><?php echo htmlspecialchars(iniciales($_SESSION['nombre'], '')); ?></div>
                     <?php echo htmlspecialchars($_SESSION['nombre']); ?> ▾
@@ -151,7 +155,7 @@ function iniciales($nombre, $apellido) {
             <div class="admin-stats-row">
                 <div class="tarjeta-stat">
                     <div class="tarjeta-stat-encabezado">
-                        <div class="tarjeta-stat-icono icono-azul">📅</div>
+                        <div class="tarjeta-stat-icono icono-azul"><?php echo icono('calendario', 20); ?></div>
                         <div class="tarjeta-stat-titulo">Consultas hoy</div>
                     </div>
                     <div class="tarjeta-stat-numero"><?php echo $consultasHoy; ?></div>
@@ -162,7 +166,7 @@ function iniciales($nombre, $apellido) {
 
                 <div class="tarjeta-stat">
                     <div class="tarjeta-stat-encabezado">
-                        <div class="tarjeta-stat-icono icono-verde">👥</div>
+                        <div class="tarjeta-stat-icono icono-verde"><?php echo icono('usuarios', 20); ?></div>
                         <div class="tarjeta-stat-titulo">Pacientes activos</div>
                     </div>
                     <div class="tarjeta-stat-numero"><?php echo $totalPacientes; ?></div>
@@ -173,7 +177,7 @@ function iniciales($nombre, $apellido) {
 
                 <div class="tarjeta-stat">
                     <div class="tarjeta-stat-encabezado">
-                        <div class="tarjeta-stat-icono icono-morado">📄</div>
+                        <div class="tarjeta-stat-icono icono-morado"><?php echo icono('archivo', 20); ?></div>
                         <div class="tarjeta-stat-titulo">Recetas hoy</div>
                     </div>
                     <div class="tarjeta-stat-numero"><?php echo $recetasHoy; ?></div>
@@ -185,6 +189,15 @@ function iniciales($nombre, $apellido) {
 
             <!-- Tarjeta de gestión de usuarios -->
             <div class="tarjeta-usuarios">
+                <?php if (isset($_GET['creado'])): ?>
+                    <div class="alerta alerta-exito">Usuario creado correctamente.</div>
+                <?php elseif (isset($_GET['editado'])): ?>
+                    <div class="alerta alerta-exito">Usuario actualizado correctamente.</div>
+                <?php elseif (isset($_GET['estadoActualizado'])): ?>
+                    <div class="alerta alerta-exito">Estado del usuario actualizado.</div>
+                <?php elseif (isset($_GET['error']) && $_GET['error'] === 'noPuedesDesactivarte'): ?>
+                    <div class="alerta alerta-error">No puedes desactivar tu propia cuenta mientras la tienes abierta.</div>
+                <?php endif; ?>
                 <div class="tarjeta-usuarios-header">
                     <div>
                         <h2>Gestión de Usuarios</h2>
@@ -248,8 +261,20 @@ function iniciales($nombre, $apellido) {
                                 <?php endif; ?>
                             </td>
                             <td class="acciones-fila">
-                                <a href="editar_usuario.php?id=<?php echo $u['id_usuario']; ?>" title="Editar">✏️</a>
-                                <a href="cambiar_estado_usuario.php?id=<?php echo $u['id_usuario']; ?>" title="Más opciones">⋯</a>
+                                <a href="editar_usuario.php?id=<?php echo $u['id_usuario']; ?>" title="Editar"><?php echo icono('editar', 15); ?></a>
+                                <?php if ($u['id_usuario'] == $_SESSION['id_usuario']): ?>
+                                    <a href="#" title="No puedes desactivar tu propia cuenta" style="opacity:0.35; cursor:not-allowed;" onclick="return false;"><?php echo icono('candado', 15); ?></a>
+                                <?php elseif ($u['activo']): ?>
+                                    <a href="cambiar_estado_usuario.php?id=<?php echo $u['id_usuario']; ?>" title="Desactivar usuario"
+                                       onclick="return confirm('¿Desactivar a <?php echo htmlspecialchars(addslashes($u['nombre'] . ' ' . $u['apellido'])); ?>? No podrá iniciar sesión hasta que lo actives de nuevo.');">
+                                        <?php echo icono('candado', 15); ?>
+                                    </a>
+                                <?php else: ?>
+                                    <a href="cambiar_estado_usuario.php?id=<?php echo $u['id_usuario']; ?>" title="Activar usuario"
+                                       onclick="return confirm('¿Activar a <?php echo htmlspecialchars(addslashes($u['nombre'] . ' ' . $u['apellido'])); ?>?');">
+                                        <?php echo icono('escudo', 15); ?>
+                                    </a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -287,10 +312,10 @@ function iniciales($nombre, $apellido) {
             <div class="panel-lateral">
                 <div class="tarjeta-lateral">
                     <h3>Acciones Rápidas</h3>
-                    <a href="crear_usuario.php" class="accion-rapida">➕ Nuevo Usuario</a>
-                    <a href="crear_usuario.php?rol=medico" class="accion-rapida">🧑‍⚕️ Registrar Médico</a>
-                    <a href="admin_reportes.php" class="accion-rapida">📊 Ver Reportes</a>
-                    <a href="admin_configuracion.php" class="accion-rapida">⚙️ Configuración</a>
+                    <a href="crear_usuario.php" class="accion-rapida"><?php echo icono('usuario-mas', 16); ?> Nuevo Usuario</a>
+                    <a href="crear_usuario.php?rol=medico" class="accion-rapida"><?php echo icono('medico', 16); ?> Registrar Médico</a>
+                    <a href="admin_reportes.php" class="accion-rapida"><?php echo icono('grafico', 16); ?> Ver Reportes</a>
+                    <a href="admin_configuracion.php" class="accion-rapida"><?php echo icono('engranaje', 16); ?> Configuración</a>
                 </div>
 
                 <div class="tarjeta-lateral">
