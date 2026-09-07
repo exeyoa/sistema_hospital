@@ -1,70 +1,164 @@
-/* login.css — layout dividido, mobile-first, versión moderna */
+/* login.css — layout dividido, mobile-first, versión moderna.
+   Panel de marca con carrusel de fotos (solo login.php).
+   Compartido con recuperar.php: todas las clases existentes se conservan.
+   Paleta azul celeste LOCAL para esta pantalla (las variables de estilo.css
+   NO se tocan). */
 
 .pantalla-login {
     min-height: 100vh;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
+
+    /* Paleta local solo para esta pantalla */
+    --carrusel-azul-oscuro: #0B3D66;
+    --carrusel-azul-medio: #1D5DA6;
+    --carrusel-azul-claro: #BFE0F5;
 }
 
-/* Panel de marca: franja superior en móvil, columna izquierda en escritorio */
+/* ===== Panel de marca =====
+   Fondo degradado con la paleta azul local (respaldo en login,
+   fondo directo en recuperar.php, que no tiene carrusel). */
 .panel-marca {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(160deg, var(--color-primario) 0%, var(--color-primario-oscuro) 100%);
+    background-color: #F2F8FD;
+    background-image: linear-gradient(160deg, rgba(11, 61, 102, 0.82) 0%, rgba(29, 93, 166, 0.55) 100%);
     color: #fff;
-    padding: 40px 24px;
+    padding: 2.5rem 1.5rem 2rem;
+}
+
+/* Carrusel de fondo con crossfade */
+.carrusel-fondo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.carrusel-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+}
+
+.carrusel-slide.activo {
+    opacity: 1;
+}
+
+/* Velo: degradado celeste/blanco sobre las fotos.
+   rgba derivados de las variables locales de .pantalla-login:
+     --carrusel-azul-oscuro  #0B3D66  -> rgba(11,61,102,...)
+     --carrusel-azul-medio   #1D5DA6  -> rgba(29,93,166,...)
+     --carrusel-azul-claro   #BFE0F5  -> rgba(191,224,245,...) */
+.carrusel-velo {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(160deg,
+            rgba(11, 61, 102, 0.52) 0%,
+            rgba(29, 93, 166, 0.38) 45%,
+            rgba(191, 224, 245, 0.10) 100%);
+    pointer-events: none;
 }
 
 .patron-decorativo {
     position: absolute;
     inset: 0;
+    z-index: 2;
     background-image: radial-gradient(circle, rgba(255,255,255,0.14) 1.5px, transparent 1.5px);
     background-size: 26px 26px;
-    opacity: 0.5;
+    opacity: 0.45;
     pointer-events: none;
 }
 
 .contenido-marca {
     position: relative;
-    z-index: 1;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
     animation: aparecer-desde-abajo 0.6s ease both;
 }
 
+.marca-encabezado {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.marca-titulo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 .panel-marca .icono-cruz {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 16px;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
 }
 
 .panel-marca h1 {
-    font-size: 22px;
+    font-size: clamp(1.35rem, 5.5vw, 1.9rem);
     color: #fff;
+    line-height: 1.1;
 }
 
 .panel-marca p {
-    font-size: 14px;
-    color: #CFE8E3;
-    max-width: 320px;
+    font-size: 0.95rem;
+    color: #EAF4FB;
+    max-width: 34ch;
 }
 
-/* Panel del formulario */
+.logo-cssp {
+    width: clamp(110px, 32vw, 160px);
+    max-width: 100%;
+    height: auto;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 10px;
+    padding: 0.4rem 0.7rem;
+}
+
+.marca-seguridad {
+    display: none;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: #EAF6F4;
+}
+
+.icono-escudo {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    color: #fff;
+    margin-top: 1px;
+}
+
+/* ===== Panel del formulario (funcionalidad intacta) ===== */
 .panel-formulario {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px 20px 48px;
+    padding: 2rem 1rem 2.5rem;
     background: var(--color-fondo);
 }
 
 .tarjeta-login {
     width: 100%;
-    max-width: 380px;
+    max-width: 460px;
     background: #fff;
     border: 1px solid var(--color-borde);
     border-radius: 16px;
-    padding: 32px 28px;
-    box-shadow: 0 20px 40px -20px rgba(11, 93, 82, 0.25);
+    padding: clamp(1.5rem, 5vw, 2rem);
+    box-shadow: 0 24px 48px -20px rgba(29, 93, 166, 0.3);
     animation: aparecer-desde-abajo 0.5s ease both 0.1s;
 }
 
@@ -78,16 +172,25 @@
     margin-bottom: 26px;
 }
 
+/* Objetivo táctil mínimo en todos los tamaños (evita zoom iOS) */
+.campo input,
+.campo select {
+    font-size: 16px;
+    min-height: 44px;
+}
+
 .tarjeta-login .btn {
     width: 100%;
     margin-top: 8px;
     transform: translateY(0);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background-color: var(--carrusel-azul-medio);
 }
 
 .tarjeta-login .btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 16px -6px rgba(11, 93, 82, 0.45);
+    box-shadow: 0 8px 16px -6px rgba(29, 93, 166, 0.45);
+    background-color: var(--carrusel-azul-oscuro);
 }
 
 /* Fila con label + link de recuperar contraseña */
@@ -132,7 +235,7 @@
     padding-left: 42px;
 }
 
-.input-con-icono input#password {
+.input-con-icono input[type="password"] {
     padding-right: 42px;
 }
 
@@ -171,7 +274,33 @@
     }
 }
 
-/* Tablet y escritorio: pasa a dos columnas lado a lado */
+@media (prefers-reduced-motion: reduce) {
+    .carrusel-slide {
+        transition: none;
+    }
+}
+
+/* ===== Móvil pequeño (<480px): banda superior baja, escudo oculto,
+         tarjeta casi a ancho completo ===== */
+@media (max-width: 479.98px) {
+    .panel-marca {
+        padding: 1.75rem 1.25rem 1.5rem;
+    }
+}
+
+/* ===== Móvil ≥480px: franja superior con escudo, tarjeta centrada ===== */
+@media (min-width: 480px) {
+    .marca-seguridad {
+        display: flex;
+    }
+
+    .panel-marca {
+        padding: 3rem 2rem;
+    }
+}
+
+/* ===== Tablet y escritorio: dos columnas; carrusel reducido
+         proporcionalmente (38%) y contenido distribuido ===== */
 @media (min-width: 768px) {
     .pantalla-login {
         flex-direction: row;
@@ -179,28 +308,77 @@
 
     .panel-marca {
         width: 38%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: 48px;
+        padding: clamp(2rem, 5vw, 3rem);
+    }
+
+    .contenido-marca {
+        min-height: 100%;
+        gap: 1.5rem;
+    }
+
+    .marca-seguridad {
+        margin-top: auto;
+    }
+
+    .mensaje-marca {
+        margin-bottom: auto;
+        padding-top: 1rem;
     }
 
     .panel-marca h1 {
-        font-size: 28px;
+        font-size: clamp(1.4rem, 3vw, 1.75rem);
     }
 
     .panel-formulario {
         width: 62%;
+        padding: 3rem 2rem;
+    }
+
+    .tarjeta-login {
+        max-width: 380px;
     }
 }
 
-@media (min-width: 1024px) {
+/* ===== Laptop/escritorio mediano (992–1200px) ===== */
+@media (min-width: 992px) {
     .panel-marca {
         width: 42%;
-        padding: 64px;
+        padding: clamp(2.5rem, 6vw, 4rem);
+    }
+
+    .panel-formulario {
+        width: 58%;
     }
 
     .tarjeta-login {
         max-width: 400px;
+    }
+
+    .panel-marca h1 {
+        font-size: clamp(1.6rem, 2.6vw, 1.9rem);
+    }
+
+    .logo-cssp {
+        width: clamp(140px, 15vw, 170px);
+    }
+}
+
+/* ===== Escritorio grande (>1200px): marca 45% / form 55% ===== */
+@media (min-width: 1200px) {
+    .panel-marca {
+        width: 45%;
+        padding: clamp(3rem, 6vw, 5rem);
+    }
+
+    .panel-formulario {
+        width: 55%;
+    }
+
+    .tarjeta-login {
+        max-width: clamp(400px, 34vw, 440px);
+    }
+
+    .panel-marca p {
+        font-size: 1rem;
     }
 }

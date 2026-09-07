@@ -1,11 +1,8 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/sesion.php';
 
 // --- Protección de sesión (idéntica a medico.php) ---
-if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'medico') {
-    header('Location: login.php');
-    exit;
-}
+verificarSesion(['medico']);
 
 require_once __DIR__ . '/../config/conexion.php'; // expone $conexion (PDO)
 

@@ -112,3 +112,38 @@ a {
     margin: 40px auto;
     padding: 0 20px;
 }
+
+/* ===========================================================
+   Lista de requisitos de contraseña (validación en tiempo real)
+   Se usa en crear_usuario.php y en recuperar.php (sub-paso B).
+   =========================================================== */
+.lista-requisitos-password {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    font-size: 0.8rem;
+    display: grid;
+    gap: 2px;
+    color: var(--color-texto-suave);
+}
+
+.lista-requisitos-password li {
+    position: relative;
+    padding-left: 20px;
+}
+
+.lista-requisitos-password li::before {
+    content: "✗";
+    position: absolute;
+    left: 0;
+    color: var(--color-error);
+}
+
+.lista-requisitos-password li.cumple {
+    color: var(--color-primario);
+}
+
+.lista-requisitos-password li.cumple::before {
+    content: "✓";
+    color: var(--color-primario);
+}
