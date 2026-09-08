@@ -1,13 +1,16 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/sesion.php';
 
+// Protección de sesión (igual que en admin.php)
+verificarSesion(['admin']);
+
+$csrfToken = generarTokenCSRF();
 if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'admin') {
     header('Location: login.php');
     exit;
 }
 
 require_once __DIR__ . '/../config/conexion.php'; // expone $conexion (PDO)
-require_once __DIR__ . '/_iconos.php';
 
 $error = '';
 
@@ -15,6 +18,12 @@ $roles = $conexion->query("SELECT id_rol, nombre_rol FROM roles ORDER BY nombre_
 $especialidades = $conexion->query("SELECT id_especialidad, nombre_especialidad FROM especialidades ORDER BY nombre_especialidad")->fetchAll(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // 0) Validación CSRF (RNF-08) — revierte solicitudes no autorizadas
+    if (!validarTokenCSRF($_POST['csrf_token'] ?? null)) {
+        header('Location: crear_usuario.php');
+        exit;
+    }
 
     $nombre    = trim($_POST['nombre'] ?? '');
     $apellido  = trim($_POST['apellido'] ?? '');
@@ -30,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Todos los campos marcados son obligatorios.';
     } elseif (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
         $error = 'El correo no tiene un formato válido.';
-    } elseif (strlen($password) < 6) {
-        $error = 'La contraseña debe tener al menos 6 caracteres.';
+    } elseif ($erroresPolitica = validarPoliticaPassword($password)) {
+        $error = 'La contraseña debe ' . implode(', ', $erroresPolitica) . '.';
     } else {
         $stmt = $conexion->prepare("SELECT COUNT(*) FROM usuarios WHERE correo = :correo OR usuario = :usuario");
         $stmt->execute([':correo' => $correo, ':usuario' => $usuario]);
@@ -180,6 +189,7 @@ function iniciales($nombre, $apellido) {
                     <?php endif; ?>
 
                     <form method="POST" action="crear_usuario.php" id="formNuevoUsuario">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
 
                         <div class="form-fila">
                             <div class="form-grupo">
@@ -221,12 +231,9 @@ function iniciales($nombre, $apellido) {
 
                         <div class="form-fila">
                             <div class="form-grupo">
-                                <label for="password"><?php echo icono('candado', 15); ?> Contraseña</label>
-                                <div class="campo-icono campo-password">
-                                    <?php echo icono('candado', 16); ?>
-                                    <input type="password" id="password" name="password" placeholder="Ingresa la contraseña" required minlength="6">
-                                    <button type="button" onclick="alternarPassword()" id="botonOjo"><?php echo icono('ojo', 17); ?></button>
-                                </div>
+                                <label for="password">Contraseña</label>
+                                <input type="password" id="password" name="password" required minlength="6">
+                                <div class="form-ayuda">Mínimo 6 caracteres. Se guarda cifrada, nunca en texto plano.</div>
                             </div>
                             <div class="form-grupo">
                                 <label for="id_rol"><?php echo icono('escudo', 15); ?> Rol</label>
@@ -316,18 +323,6 @@ function mostrarCamposMedico() {
     document.getElementById('camposMedico').style.display = (rolTexto === 'medico') ? 'block' : 'none';
 }
 document.addEventListener('DOMContentLoaded', mostrarCamposMedico);
-
-function alternarPassword() {
-    const campo = document.getElementById('password');
-    const boton = document.getElementById('botonOjo');
-    if (campo.type === 'password') {
-        campo.type = 'text';
-        boton.innerHTML = '<?php echo addslashes(icono("ojo-cerrado", 17)); ?>';
-    } else {
-        campo.type = 'password';
-        boton.innerHTML = '<?php echo addslashes(icono("ojo", 17)); ?>';
-    }
-}
 </script>
 
 </body>

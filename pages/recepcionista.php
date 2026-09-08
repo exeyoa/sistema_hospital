@@ -1,21 +1,18 @@
 <?php
-session_start();
-if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] !== 'recepcionista') {
-    header('Location: login.php');
-    exit;
-}
+require_once __DIR__ . '/../config/sesion.php';
+verificarSesion(['recepcionista']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Panel recepcionista - Sistema Hospital</title>
+    <title>Panel recepcionista - Hospital Raúl Dávila Mena</title>
     <link rel="stylesheet" href="../css/estilo.css">
 </head>
 <body>
     <div class="barra-superior">
-        <span class="marca">Sistema Hospital</span>
+        <span class="marca">Hospital Raúl Dávila Mena</span>
         <div>
             <span><?= htmlspecialchars($_SESSION['nombre']) ?> · Recepcionista</span>
             &nbsp;·&nbsp;<a href="logout.php">Cerrar sesión</a>

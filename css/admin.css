@@ -884,3 +884,51 @@ body.admin-body {
     background: linear-gradient(135deg, var(--admin-azul), #4f8ef7);
     border: none;
 }
+
+/* Input con icono a la izquierda (y botón de ver contraseña a la derecha) */
+.input-con-icono {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-con-icono svg {
+    position: absolute;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    color: var(--color-texto-suave);
+    pointer-events: none;
+}
+
+.input-con-icono input {
+    padding-left: 42px;
+}
+
+.input-con-icono input#password {
+    padding-right: 42px;
+}
+
+.boton-ver-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    color: var(--color-texto-suave);
+    border-radius: 6px;
+}
+
+.boton-ver-password:hover {
+    color: var(--color-primario);
+    background: var(--color-primario-claro);
+}
+
+.boton-ver-password svg {
+    position: static;
+    width: 19px;
+    height: 19px;
+    pointer-events: auto;
+}
