@@ -2,11 +2,8 @@
 /**
  * config/correo.php
  * Configuración SMTP para el envío de correo (PHPMailer).
- * La contraseña de aplicación la rellena MANUALMENTE el dueño del proyecto.
- * Este archivo está ignorado en el control de versiones.
+ * Los valores (host, puerto, usuario, password de aplicación, remitente)
+ * se leen desde config/entorno.php: ahí se reemplazan antes de subir
+ * al hosting real.
  */
-
-const CORREO_SMTP_HOST       = 'smtp.gmail.com';
-const CORREO_SMTP_PUERTO     = 587;
-const CORREO_REMITENTE       = 'simulacionhospital@gmail.com';
-const CORREO_APP_PASSWORD    = 'ylstrbhjxijhhwyr';
+require_once __DIR__ . '/entorno.php';

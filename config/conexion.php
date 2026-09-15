@@ -1,11 +1,14 @@
 <?php
-$host = "localhost";
-$db_name = "hospital_db";
-$usuario = "root";
-$password = "";
+// Credenciales de conexión leídas desde config/entorno.php (único lugar
+// donde se pegan los valores reales del hosting).
+require_once __DIR__ . '/entorno.php';
 
 try {
-    $conexion = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $usuario, $password);
+    $conexion = new PDO(
+        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8",
+        DB_USER,
+        DB_PASSWORD
+    );
     $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     // No mostramos $e->getMessage() al usuario (RNF-08): podría revelar

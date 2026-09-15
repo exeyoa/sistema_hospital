@@ -6,7 +6,8 @@
 -- auditoría de accesos al sistema.
 -- =====================================================================
 
-USE hospital_db;
+-- Comentada para importar directo en la base ya seleccionada (evita error 1044)
+-- USE hospital_db;
 
 CREATE TABLE IF NOT EXISTS intentos_login (
     id_intento   INT AUTO_INCREMENT PRIMARY KEY,
