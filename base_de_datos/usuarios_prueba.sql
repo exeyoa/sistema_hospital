@@ -4,10 +4,10 @@
 -- Comentada para importar directo en la base ya seleccionada (evita error 1044)
 -- USE hospital_db;
 
-INSERT INTO usuarios (nombre, apellido, correo, usuario, cedula, password_hash, id_rol) VALUES
-('Ana', 'Administradora', 'admin@hospital.com', 'admin', '4-555-789', '$2y$10$ZfFWMlq3ch8QZdfbR7ZZhOC7dpS8BdbRD6ikwMjs7VCDrZrbpS0fi', 1),
-('Carlos', 'Pérez', 'medico@hospital.com', 'medico1', '6-210-345', '$2y$10$ZfFWMlq3ch8QZdfbR7ZZhOC7dpS8BdbRD6ikwMjs7VCDrZrbpS0fi', 2),
-('Laura', 'Gómez', 'recepcion@hospital.com', 'recepcion1', '8-123-456', '$2y$10$ZfFWMlq3ch8QZdfbR7ZZhOC7dpS8BdbRD6ikwMjs7VCDrZrbpS0fi', 3);
+INSERT INTO usuarios (nombre, apellido, correo, usuario, password_hash, id_rol) VALUES
+('Ana', 'Administradora', 'admin@hospital.com', 'admin', '$2y$10$ZfFWMlq3ch8QZdfbR7ZZhOC7dpS8BdbRD6ikwMjs7VCDrZrbpS0fi', 1),
+('Carlos', 'Pérez', 'medico@hospital.com', 'medico1', '$2y$10$ZfFWMlq3ch8QZdfbR7ZZhOC7dpS8BdbRD6ikwMjs7VCDrZrbpS0fi', 2),
+('Laura', 'Gómez', 'recepcion@hospital.com', 'recepcion1', '$2y$10$ZfFWMlq3ch8QZdfbR7ZZhOC7dpS8BdbRD6ikwMjs7VCDrZrbpS0fi', 3);
 
 -- Vincula al médico de prueba con una especialidad (medicina general = id 1)
 INSERT INTO medicos (id_usuario, id_especialidad, numero_colegiado)

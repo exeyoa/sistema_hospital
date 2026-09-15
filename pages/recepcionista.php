@@ -167,14 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="campo">
                 <label for="cedula">Cédula</label>
-                <?php
-                $sel_cedula_id = 'cedula';
-                $sel_cedula_nombre = 'cedula';
-                $sel_cedula_valor = $cedula;
-                include __DIR__ . '/../componentes/selector_cedula.php';
-                ?>
-                <button type="button" class="btn" id="btn-buscar-cedula">Buscar</button>
-                <div id="estado-cedula" aria-live="polite"></div>
+                <input type="text" id="cedula" name="cedula" value="<?= htmlspecialchars($cedula, ENT_QUOTES, 'UTF-8') ?>" required>
             </div>
 
             <div class="campo">
@@ -218,67 +211,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         var boton = document.getElementById('btn-registrar-paciente');
         boton.disabled = true;
         boton.textContent = 'Registrando…';
-    });
-
-    // Autocompletado de datos del paciente desde el Tribunal Electoral
-    var btnBuscar = document.getElementById('btn-buscar-cedula');
-    var estadoCedula = document.getElementById('estado-cedula');
-    var campoCedula = document.getElementById('cedula');
-
-    function mostrarEstado(mensaje, clase) {
-        estadoCedula.textContent = mensaje;
-        estadoCedula.className = clase;
-    }
-
-    btnBuscar.addEventListener('click', function () {
-        var cedula = campoCedula.value.trim();
-
-        // Validación de formato en el cliente antes de llamar al servidor
-        if (!/^(?:[A-Z]{1,2}-)?\d{1,4}-\d{1,4}(?:-\d{1,4})?$/.test(cedula)) {
-            mostrarEstado('Formato de cédula no válido (ejemplo: 8-123-456).', 'mensaje-info');
-            return;
-        }
-
-        var csrf = document.querySelector('input[name="csrf_token"]').value;
-
-        mostrarEstado('Buscando cédula…', 'mensaje-info');
-        btnBuscar.disabled = true;
-
-        var datos = new URLSearchParams();
-        datos.append('cedula', cedula);
-        datos.append('csrf_token', csrf);
-
-        fetch('ajax/consultar_cedula.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: datos
-        })
-        .then(function (resp) {
-            return resp.json().then(function (datosResp) {
-                return { estado: resp.status, datos: datosResp };
-            });
-        })
-        .then(function (resultado) {
-            if (resultado.estado === 200) {
-                document.getElementById('nombre').value = resultado.datos.nombres;
-                document.getElementById('apellido').value = resultado.datos.apellidos;
-                document.getElementById('fecha_nacimiento').value = resultado.datos.fecha_nacimiento;
-                document.getElementById('sexo').value = resultado.datos.sexo;
-                mostrarEstado('Datos encontrados en el Tribunal Electoral', 'mensaje-exito');
-            } else if (resultado.estado === 404) {
-                mostrarEstado('No se encontró esa cédula, puedes ingresar los datos manualmente', 'mensaje-info');
-            } else {
-                console.error('Error al consultar el Tribunal Electoral:', resultado.estado, resultado.datos);
-                mostrarEstado('No se pudo verificar la cédula, puedes continuar manualmente', 'mensaje-error');
-            }
-        })
-        .catch(function (error) {
-            console.error('No se pudo contactar el servicio del Tribunal Electoral:', error);
-            mostrarEstado('No se pudo verificar la cédula, puedes continuar manualmente', 'mensaje-error');
-        })
-        .finally(function () {
-            btnBuscar.disabled = false;
-        });
     });
     </script>
 </body>

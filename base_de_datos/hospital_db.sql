@@ -18,7 +18,6 @@ CREATE TABLE usuarios (
     apellido VARCHAR(60) NOT NULL,
     correo VARCHAR(100) UNIQUE,
     usuario VARCHAR(40) NOT NULL UNIQUE,
-    cedula VARCHAR(20) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     id_rol INT NOT NULL,
     activo TINYINT(1) DEFAULT 1,
