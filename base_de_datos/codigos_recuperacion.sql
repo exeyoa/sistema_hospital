@@ -2,7 +2,8 @@
 -- Tabla para códigos de recuperación de 6 dígitos (expiran en 5 minutos).
 -- No elimina físicamente los códigos: se marcan con usado = 1.
 
-USE hospital_db;
+-- Comentada para importar directo en la base ya seleccionada (evita error 1044)
+-- USE hospital_db;
 
 CREATE TABLE IF NOT EXISTS codigos_recuperacion (
     id_codigo INT AUTO_INCREMENT PRIMARY KEY,

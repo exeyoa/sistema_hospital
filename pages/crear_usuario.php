@@ -34,74 +34,101 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $apellido  = trim($_POST['apellido'] ?? '');
     $correo    = trim($_POST['correo'] ?? '');
     $usuario   = trim($_POST['usuario'] ?? '');
+    $cedula    = trim($_POST['cedula'] ?? '');
     $password  = $_POST['password'] ?? '';
     $id_rol    = $_POST['id_rol'] ?? '';
     $id_especialidad = $_POST['id_especialidad'] ?? '';
     $numero_colegiado = trim($_POST['numero_colegiado'] ?? '');
 
     // 2) Validaciones básicas
-    if ($nombre === '' || $apellido === '' || $correo === '' || $usuario === '' || $password === '' || $id_rol === '') {
+    if ($nombre === '' || $apellido === '' || $correo === '' || $usuario === '' || $cedula === '' || $password === '' || $id_rol === '') {
         $error = 'Todos los campos marcados son obligatorios.';
+    } elseif (!preg_match('/^(?:[A-Z]{1,2}-)?\d{1,4}-\d{1,4}(?:-\d{1,4})?$/', $cedula)) {
+        $error = 'La cédula no tiene un formato válido (ejemplo: 8-123-456).';
     } elseif (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
         $error = 'El correo no tiene un formato válido.';
     } elseif ($erroresPolitica = validarPoliticaPassword($password)) {
         $error = 'La contraseña debe ' . implode(', ', $erroresPolitica) . '.';
     } else {
-        // 3) Verificamos que el correo y el usuario no existan ya
-        $stmt = $conexion->prepare("SELECT COUNT(*) FROM usuarios WHERE correo = :correo OR usuario = :usuario");
-        $stmt->execute([':correo' => $correo, ':usuario' => $usuario]);
+        // 3) Verificación de identidad: la cédula DEBE existir en el Tribunal
+        // Electoral (fail-closed: si no se puede verificar positivamente,
+        // no se crea la cuenta).
+        require_once __DIR__ . '/../config/api_tribunal.php';
+        $respuestaTribunal = consultarCedulaTribunal($cedula);
 
-        if ($stmt->fetchColumn() > 0) {
-            $error = 'Ya existe un usuario con ese correo o nombre de usuario.';
+        if ($respuestaTribunal['codigo'] === 404) {
+            $error = 'La cédula ' . htmlspecialchars($cedula, ENT_QUOTES, 'UTF-8') . ' no está registrada en el Tribunal Electoral; no se puede crear el usuario.';
+        } elseif ($respuestaTribunal['codigo'] !== 200) {
+            $error = 'No se pudo verificar la cédula con el Tribunal Electoral; inténtalo más tarde.';
         } else {
-            // 4) Todo bien -> insertamos
-            try {
-                $conexion->beginTransaction();
+            // 4) Verificamos que el correo y el usuario no existan ya
+            $stmt = $conexion->prepare("SELECT COUNT(*) FROM usuarios WHERE correo = :correo OR usuario = :usuario");
+            $stmt->execute([':correo' => $correo, ':usuario' => $usuario]);
 
-                $passwordHash = password_hash($password, PASSWORD_BCRYPT);
-
-                $stmt = $conexion->prepare(
-                    "INSERT INTO usuarios (nombre, apellido, correo, usuario, password_hash, id_rol, activo, fecha_creacion)
-                     VALUES (:nombre, :apellido, :correo, :usuario, :password_hash, :id_rol, 1, NOW())"
-                );
-                $stmt->execute([
-                    ':nombre' => $nombre,
-                    ':apellido' => $apellido,
-                    ':correo' => $correo,
-                    ':usuario' => $usuario,
-                    ':password_hash' => $passwordHash,
-                    ':id_rol' => $id_rol,
-                ]);
-
-                $idUsuarioNuevo = $conexion->lastInsertId();
-
-                // Si el rol elegido corresponde a 'medico', también guardamos en la tabla medicos
+            if ($stmt->fetchColumn() > 0) {
+                $error = 'Ya existe un usuario con ese correo o nombre de usuario.';
+            } else {
+                // 5) Validación de los campos propios del médico (fuera de la transacción)
                 $stmtRol = $conexion->prepare("SELECT nombre_rol FROM roles WHERE id_rol = :id_rol");
                 $stmtRol->execute([':id_rol' => $id_rol]);
                 $nombreRolElegido = $stmtRol->fetchColumn();
 
-                if ($nombreRolElegido === 'medico') {
-                    if ($id_especialidad === '' || $numero_colegiado === '') {
-                        throw new Exception('Debes indicar especialidad y número de colegiado para un médico.');
+                if ($nombreRolElegido === 'medico' && ($id_especialidad === '' || $numero_colegiado === '')) {
+                    $error = 'Debes indicar especialidad y número de colegiado para un médico.';
+                } else {
+                    // 6) Todo bien -> insertamos
+                    try {
+                        $conexion->beginTransaction();
+
+                        $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+
+                        $stmt = $conexion->prepare(
+                            "INSERT INTO usuarios (nombre, apellido, correo, usuario, cedula, password_hash, id_rol, activo, fecha_creacion)
+                             VALUES (:nombre, :apellido, :correo, :usuario, :cedula, :password_hash, :id_rol, 1, NOW())"
+                        );
+                        $stmt->execute([
+                            ':nombre' => $nombre,
+                            ':apellido' => $apellido,
+                            ':correo' => $correo,
+                            ':usuario' => $usuario,
+                            ':cedula' => $cedula,
+                            ':password_hash' => $passwordHash,
+                            ':id_rol' => $id_rol,
+                        ]);
+
+                        $idUsuarioNuevo = $conexion->lastInsertId();
+
+                        // Si el rol elegido corresponde a 'medico', también guardamos en la tabla medicos
+                        if ($nombreRolElegido === 'medico') {
+                            $stmt = $conexion->prepare(
+                                "INSERT INTO medicos (id_usuario, id_especialidad, numero_colegiado)
+                                 VALUES (:id_usuario, :id_especialidad, :numero_colegiado)"
+                            );
+                            $stmt->execute([
+                                ':id_usuario' => $idUsuarioNuevo,
+                                ':id_especialidad' => $id_especialidad,
+                                ':numero_colegiado' => $numero_colegiado,
+                            ]);
+                        }
+
+                        $conexion->commit();
+                        header('Location: admin.php?creado=1');
+                        exit;
+
+                    } catch (PDOException $e) {
+                        $conexion->rollBack();
+                        if ($e->getCode() === '23000') {
+                            $error = 'Ya existe un usuario con esa cédula.';
+                        } else {
+                            error_log('Error al crear usuario: ' . $e->getMessage());
+                            $error = 'No se pudo crear el usuario. Intenta nuevamente o contacta al administrador del sistema.';
+                        }
+                    } catch (Exception $e) {
+                        $conexion->rollBack();
+                        error_log('Error al crear usuario: ' . $e->getMessage());
+                        $error = 'No se pudo crear el usuario. Intenta nuevamente o contacta al administrador del sistema.';
                     }
-                    $stmt = $conexion->prepare(
-                        "INSERT INTO medicos (id_usuario, id_especialidad, numero_colegiado)
-                         VALUES (:id_usuario, :id_especialidad, :numero_colegiado)"
-                    );
-                    $stmt->execute([
-                        ':id_usuario' => $idUsuarioNuevo,
-                        ':id_especialidad' => $id_especialidad,
-                        ':numero_colegiado' => $numero_colegiado,
-                    ]);
                 }
-
-                $conexion->commit();
-                header('Location: admin.php?creado=1');
-                exit;
-
-            } catch (Exception $e) {
-                $conexion->rollBack();
-                $error = 'No se pudo crear el usuario: ' . $e->getMessage();
             }
         }
     }
@@ -197,6 +224,20 @@ function iniciales($nombre, $apellido) {
                                 <label for="apellido">Apellido</label>
                                 <input type="text" id="apellido" name="apellido" required
                                        value="<?php echo htmlspecialchars($_POST['apellido'] ?? ''); ?>">
+                            </div>
+                        </div>
+
+                        <div class="form-fila">
+                            <div class="form-grupo form-grupo-cedula">
+                                <label for="cedula">Cédula</label>
+                                <?php
+                                $sel_cedula_id = 'cedula';
+                                $sel_cedula_nombre = 'cedula';
+                                $sel_cedula_valor = $_POST['cedula'] ?? '';
+                                include __DIR__ . '/../componentes/selector_cedula.php';
+                                ?>
+                                <button type="button" class="btn" id="btn-buscar-cedula">Buscar</button>
+                                <div id="estado-cedula" aria-live="polite"></div>
                             </div>
                         </div>
 
@@ -338,6 +379,70 @@ if (campoContrasena && listaRequisitos) {
     campoContrasena.addEventListener('input', () => actualizarRequisitosPassword(campoContrasena.value));
     actualizarRequisitosPassword(campoContrasena.value);
 }
+
+// Verificación de identidad de la cédula contra el Tribunal Electoral.
+// Fail-closed: solo autocompleta si la cédula existe; si no se encuentra
+// o el servicio no responde, se muestra el bloqueo (el servidor también
+// bloquea la creación al enviar el formulario).
+var btnBuscarCedula = document.getElementById('btn-buscar-cedula');
+var estadoCedula = document.getElementById('estado-cedula');
+var campoCedula = document.getElementById('cedula');
+
+function mostrarEstadoCedula(mensaje, clase) {
+    estadoCedula.textContent = mensaje;
+    estadoCedula.className = clase;
+}
+
+btnBuscarCedula.addEventListener('click', function () {
+    var cedula = campoCedula.value.trim();
+
+    // Validación de formato en el cliente antes de llamar al servidor
+    if (!/^(?:[A-Z]{1,2}-)?\d{1,4}-\d{1,4}(?:-\d{1,4})?$/.test(cedula)) {
+        mostrarEstadoCedula('Formato de cédula no válido (ejemplo: 8-123-456).', 'mensaje-info');
+        return;
+    }
+
+    var csrf = document.querySelector('input[name="csrf_token"]').value;
+
+    mostrarEstadoCedula('Buscando cédula…', 'mensaje-info');
+    btnBuscarCedula.disabled = true;
+
+    var datos = new URLSearchParams();
+    datos.append('cedula', cedula);
+    datos.append('csrf_token', csrf);
+
+    fetch('ajax/consultar_cedula.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: datos
+    })
+    .then(function (resp) {
+        return resp.json().then(function (datosResp) {
+            return { estado: resp.status, datos: datosResp };
+        });
+    })
+    .then(function (resultado) {
+        if (resultado.estado === 200) {
+            document.getElementById('nombre').value = resultado.datos.nombres;
+            document.getElementById('apellido').value = resultado.datos.apellidos;
+            mostrarEstadoCedula('Datos encontrados en el Tribunal Electoral', 'mensaje-exito');
+        } else if (resultado.estado === 404) {
+            document.getElementById('nombre').value = '';
+            document.getElementById('apellido').value = '';
+            mostrarEstadoCedula('La cédula no está registrada en el Tribunal Electoral; el usuario no podrá ser creado.', 'mensaje-error');
+        } else {
+            console.error('Error al consultar el Tribunal Electoral:', resultado.estado, resultado.datos);
+            mostrarEstadoCedula('No se pudo verificar la cédula; inténtalo más tarde.', 'mensaje-error');
+        }
+    })
+    .catch(function (error) {
+        console.error('No se pudo contactar el servicio del Tribunal Electoral:', error);
+        mostrarEstadoCedula('No se pudo verificar la cédula; inténtalo más tarde.', 'mensaje-error');
+    })
+    .finally(function () {
+        btnBuscarCedula.disabled = false;
+    });
+});
 </script>
 
 </body>

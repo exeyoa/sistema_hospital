@@ -1,7 +1,8 @@
 -- Usuarios de prueba para probar el login (contraseña real: prueba123)
 -- Ejecuta esto en phpMyAdmin, pestaña SQL, después de haber importado hospital_db.sql
 
-USE hospital_db;
+-- Comentada para importar directo en la base ya seleccionada (evita error 1044)
+-- USE hospital_db;
 
 INSERT INTO usuarios (nombre, apellido, correo, usuario, password_hash, id_rol) VALUES
 ('Ana', 'Administradora', 'admin@hospital.com', 'admin', '$2y$10$ZfFWMlq3ch8QZdfbR7ZZhOC7dpS8BdbRD6ikwMjs7VCDrZrbpS0fi', 1),

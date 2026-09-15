@@ -8,6 +8,7 @@
     --color-texto-suave: #5C6D68;
     --color-borde: #DDE6E3;
     --color-error: #B3261E;
+    --color-exito: #1B7A4A;
     --fuente: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --radio: 10px;
 }
@@ -87,6 +88,26 @@ a {
     background: #FBEAEA;
     color: var(--color-error);
     border: 1px solid #F0C7C4;
+    border-radius: var(--radio);
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.mensaje-exito {
+    background: #E7F4EC;
+    color: var(--color-exito);
+    border: 1px solid #BBE3CC;
+    border-radius: var(--radio);
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.mensaje-info {
+    background: #EAF1F5;
+    color: var(--color-texto-suave);
+    border: 1px solid #C9D9E3;
     border-radius: var(--radio);
     padding: 12px 14px;
     font-size: 14px;

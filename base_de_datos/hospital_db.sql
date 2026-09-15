@@ -1,8 +1,9 @@
 -- Base de datos: hospital_db
 -- Sistema de consultas médicas - normalizado hasta 3FN
-
-CREATE DATABASE IF NOT EXISTS hospital_db CHARACTER SET utf8mb4;
-USE hospital_db;
+-- Para importar en un hosting: entrar a phpMyAdmin, seleccionar la base ya
+-- creada y pegar el contenido; estas dos líneas se dejan comentadas:
+-- CREATE DATABASE IF NOT EXISTS hospital_db CHARACTER SET utf8mb4;
+-- USE hospital_db;
 
 -- Catálogo de roles del sistema
 CREATE TABLE roles (
@@ -17,11 +18,35 @@ CREATE TABLE usuarios (
     apellido VARCHAR(60) NOT NULL,
     correo VARCHAR(100) UNIQUE,
     usuario VARCHAR(40) NOT NULL UNIQUE,
+    cedula VARCHAR(20) NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     id_rol INT NOT NULL,
     activo TINYINT(1) DEFAULT 1,
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
+);
+
+-- Registro de intentos de inicio de sesión (control de fuerza bruta, RNF-08)
+CREATE TABLE intentos_login (
+    id_intento INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    fecha_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    exitoso TINYINT(1) NOT NULL,
+    ip VARCHAR(45),
+    KEY idx_usuario_fecha (id_usuario, fecha_hora),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
+-- Códigos de recuperación de contraseña (6 dígitos, expiran en 5 minutos)
+CREATE TABLE codigos_recuperacion (
+    id_codigo INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    codigo CHAR(6) NOT NULL,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_expiracion DATETIME NOT NULL,
+    usado TINYINT(1) NOT NULL DEFAULT 0,
+    KEY id_usuario (id_usuario),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
 -- Catálogo de especialidades médicas
